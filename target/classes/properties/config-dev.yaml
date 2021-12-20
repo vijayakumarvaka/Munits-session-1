@@ -1,0 +1,13 @@
+http:
+  request:
+    host: "localhost"
+    port: "8082"
+    path: "/request_to_sapi"
+    untilSuccessful:
+      maxRetries: "3"
+      timefrequency: "5000"
+  listener:
+    host: "localhost"
+    port: "8081"
+    path: "/request_to_papi"
+    

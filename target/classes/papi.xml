@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="papi_Flow" doc:id="560038ab-f466-47a5-8726-de4041a047b3" >
+		<http:listener doc:name="Listener" doc:id="b373e35d-0bd2-4fbd-a35b-bfe58a38204f" config-ref="HTTP_Listener_config" path="${secure::http.listener.path}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="84d87966-9f14-42d4-8fba-e2bb31788acb" message="sending a request to sapi"/>
+		<ee:transform doc:name="Transform Message" doc:id="16eb8265-ac5c-4d95-9677-bce909122673" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"firstName": attributes.queryParams.firstName,
+	"lastName": attributes.queryParams.lastName,
+	"age": attributes.queryParams.age,
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f4b95ff0-f1e7-4ec7-9ca8-9f6ff4170cec" message="#[output application/json&#10;---&#10;payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="12f0aa61-fbc7-4719-9030-943d792cd99e" config-ref="HTTP_Request_configuration" path="${secure::http.request.path}">
+			<reconnect count="3" />
+		</http:request>
+		<logger level="INFO" doc:name="Print the response" doc:id="f81227b3-e270-4b83-a5e4-c616749af4af" message='#[output application/json&#10;---&#10;payload]'/>
+	</flow>
+</mule>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="papi-test-suite.xml" />
+	<munit:test name="papi-test-suite-papi_FlowTest" doc:id="34fb6626-e600-4382-955e-8b8069132812" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when - http Request" doc:id="4d043150-27b6-40ed-94d2-3c4873ea1f83" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="12f0aa61-fbc7-4719-9030-943d792cd99e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json --- readUrl("classpath://test-inputs/http-response.json")]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ccf096e3-c84b-443d-8564-c48ac8dee7d7" >
+				<munit:attributes value='#["queryParams" : {"firstName" : "Virat", "lastName": "Kohli", "age" : 33}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to papi_Flow" doc:id="201dc4d1-4f6f-458a-adf5-6eba80416247" name="papi_Flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert expression" doc:id="f622c6ef-735e-4800-9a21-d205b74c03c7" >
+				<munit-tools:that ><![CDATA[#[import * from dw::test::Asserts 
+ ---
+//payload must notBeNull()
+payload.status must contain("success")]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="papi-test-suite-papi_FlowTest_HTTP:CONNECTIVITY" doc:id="b1c942de-f865-49f2-8895-64a7dce73e89" description="Test" expectedErrorType="HTTP:CONNECTIVITY">
+			<munit:behavior>
+				<munit-tools:mock-when doc:name="Mock when - http Request" doc:id="e2ec443d-32d0-4388-a3da-869257bafe9b" processor="http:request">
+					<munit-tools:with-attributes>
+						<munit-tools:with-attribute whereValue="12f0aa61-fbc7-4719-9030-943d792cd99e" attributeName="doc:id" />
+					</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+				</munit-tools:mock-when>
+			</munit:behavior>
+			<munit:execution>
+				<munit:set-event doc:name="Set Event" doc:id="24051b23-0a2d-4b91-87c1-964f313ff026">
+					<munit:attributes value='#["queryParams" : {"firstName" : "Virat", "lastName": "Kohli", "age" : 33}]' />
+				</munit:set-event>
+				<flow-ref doc:name="Flow-ref to papi_Flow" doc:id="cd154520-775b-43d2-acf9-d0a617f6d9ed" name="papi_Flow" />
+			</munit:execution>
+		</munit:test>
+
+
+</mule>
